@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Book
 
-
+# RENDER TEMPLATE
 def index(request):
     return render(request, 'template.html')
 
