@@ -6,4 +6,5 @@ http://{{ site.domain }}{% url 'registration_activate' activation_key %}
 
 This link is valid for {{ expiration_days }}. If it wasn't you that signed up for this account, don't panic! It's safe to ignore this email.
 
---- The MMJ Books Team ---
+
+-The MMJ Books Team

@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'social.apps.django_app.default',
     'registration',
     'store',
 )
@@ -65,6 +66,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social.apps.django_app.context_processors.backends',
+                'social.apps.django_app.context_processors.login_redirect',
             ],
         },
     },
@@ -72,6 +75,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bookstore.wsgi.application'
 
+AUTHENTICATION_BACKENDS = (
+    'social.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -108,7 +115,8 @@ ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_AUTO_LOGIN = True
 LOGIN_REDIRECT_URL = '/store/'
 
-# Email settings
+
+# Email settings (ab 2016 nicht mehr verfuegbar)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST_USER = "mariomuh.mmj@gmail.com"
@@ -116,3 +124,7 @@ EMAIL_HOST_PASSWORD = "mariomuh"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "books@mmjbooks.com"
+
+# Social Auth - Facebook
+SOCIAL_AUTH_FACEBOOK_KEY = '1633010443661061'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'a16e1cd1f53e6f980d738b39bc1ad69f'
