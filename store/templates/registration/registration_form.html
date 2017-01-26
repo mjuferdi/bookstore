@@ -1,9 +1,29 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<form method="post" action=".">
+{% block body %}
+<br><br><br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>Create a New Account</h3>
+                    <form class="form-horizontal" action="." method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <form method="post" action=".">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="submit" value="Register">
+                        </form>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<form method="post" action=".">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Register">
-</form>
+</form>-->
 {% endblock %}
