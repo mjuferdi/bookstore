@@ -7,10 +7,10 @@ body {
 
 /* General link styles*/
 a {
-    color: #D8562B;
+    color: #1CBC69;
 }
 a:hover {
-    color: #1CBC69;
+    color: coral;
     text-decoration: none;
 }
 
@@ -23,7 +23,7 @@ a:hover {
     color: #e6e6e6;
 }
 #navbar .navbar-nav li a {
-    color: #D8562B;
+    color: cornflowerblue;
 }
 .navbar-header .navbar-brand {
     color: #e6e6e6;
@@ -96,12 +96,12 @@ img.bg {
 }
 
 .panel-info > .panel-heading {
-    background-color: #D8562B;
-    border-color: #D8562B;
+    background-color: cornflowerblue;
+    border-color: cornflowerblue;
 }
 
 .panel-info {
-    border-color: #D8562B;
+    border-color: cornflowerblue;
 }
 
 .panel-title {
