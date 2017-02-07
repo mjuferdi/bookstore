@@ -3,7 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import Book, BookOrder, Cart
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-import paypalrestsdk
+from django.http import JsonResponse
+import paypalrestsdk, stripe
 
 # RENDER TEMPLATE
 
@@ -88,8 +89,15 @@ def checkout(request, processor):
         if processor == "paypal":
             redirect_url = checkout_paypal(request, cart, orders)
             return redirect(redirect_url)
-        else:
-            return redirect('index')
+        elif processor == "stripe":
+            token = request.POST['stripeToken']
+            status = checkout_stripe(cart, orders, token)
+            if status:
+                return redirect(reverse('process_order', args=['stripe']))
+            else:
+                return redirect('order_error', context={"message": "There was a problem processing your payment."})
+    else:
+        return redirect('index')
 
 
 def checkout_paypal(request, cart, orders):
@@ -140,6 +148,27 @@ def checkout_paypal(request, cart, orders):
         return redirect('index')
 
 
+def checkout_stripe(cart, orders, token):
+    stripe.api_key = " sk_test_h21G5X55s3uCYdJoX58zfDUE"
+    total = 0
+    for order in orders:
+        total += (order.book.price * order.quantity)
+    status = True
+    try:
+        charge = stripe.Charge.create(
+            amount=int(total * 100),
+            currency="USD",
+            source=token,
+            metadata={'order_id': cart.get().id}
+        )
+        cart_instance = cart.get()
+        cart_instance.payment_id = charge.id
+        cart_instance.save()
+    except stripe.error.CardError, e:
+        status = False
+    return status
+
+
 def order_error(request):
     if request.user.is_authenticated():
         return render(request, 'store/order_error.html')
@@ -161,6 +190,8 @@ def process_order(request, processor):
                 'total': total,
             }
             return render(request, 'store/process_order.html', context)
+        elif processor == 'stripe':
+            return JsonResponse({'redirect_url': reverse('complete_order', args=['stripe'])})
     else:
         return redirect('index')
 
@@ -171,14 +202,23 @@ def complete_order(request, processor):
         if processor == 'paypal':
             payment = paypalrestsdk.Payment.find(cart.payment_id)
             if payment.execute({"payer_id": payment.payer.payer_info.payer_id}):
-                message = "Success! Your order has been completed, and is being processed. Payment ID: %s" %(payment.id)
+                message = "Success! Your order has been completed, and is being processed. Payment ID: %s" % (payment.id)
                 cart.active = False
                 cart.order_date = timezone.now()
                 cart.save()
             else:
                 message = "There was a problem with the transaction. Error %s" % (payment.error.message)
             context = {
-                'message': message
+                'message': message,
+            }
+            return render(request, 'store/order_complete.html', context)
+        elif processor == 'stripe':
+            cart.active = False
+            cart.order_date = timezone.now()
+            cart.save()
+            message = "Success! Your order has been completed, and is being processed. Payment ID: %s" % (cart.payment_id)
+            context = {
+                'message': message,
             }
             return render(request, 'store/order_complete.html', context)
     else:
